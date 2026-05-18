@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM — Inovando Consignado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  :root {
+    --navy: #0B1F3A; --navy-mid: #153258; --navy-light: #1E4880;
+    --pink: #E8547A; --pink-light: #F4879F; --pink-pale: #FDE8EE;
+    --green: #1CB87B; --green-pale: #E0F7EE;
+    --white: #FFFFFF; --surface: #F6F8FB;
+    --border: rgba(11,31,58,0.1); --text: #0B1F3A; --text-muted: #6B7FA3;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; }
+  header { background: var(--navy); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: var(--white); letter-spacing: -0.3px; }
+  .logo span { color: var(--pink); }
+  .header-badge { background: rgba(232,84,122,0.2); color: var(--pink-light); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(232,84,122,0.3); }
+  .container { max-width: 1300px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 12px; margin-bottom: 2rem; }
+  .stat-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 1.25rem; }
+  .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .stat-value { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 700; color: var(--navy); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.pink { color: var(--pink); }
+  .stat-value.amber { color: #B45309; }
+  .stat-value.purple { color: #7C3AED; }
+  .main-grid { display: grid; grid-template-columns: 420px 1fr; gap: 1.5rem; }
+  @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+  .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+  .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .card-header h2 { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600; color: var(--navy); }
+  .card-header i { color: var(--pink); font-size: 18px; }
+  .card-body { padding: 1.5rem; }
+  .form-group { margin-bottom: 1.1rem; }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+  input[type="text"], input[type="tel"], select { width: 100%; height: 40px; padding: 0 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--white); transition: border-color 0.15s; appearance: none; -webkit-appearance: none; }
+  input[type="text"]:focus, input[type="tel"]:focus, select:focus { outline: none; border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(30,72,128,0.08); }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7FA3' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; cursor: pointer; }
+  .date-field { width: 100%; height: 40px; padding: 0 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-muted); background: var(--surface); display: flex; align-items: center; gap: 8px; }
+  .prazo-preview { margin-top: 8px; display: none; gap: 16px; flex-wrap: wrap; padding: 8px 12px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  .prazo-preview span { font-size: 12px; color: var(--text-muted); }
+  .prazo-preview strong { color: var(--navy); }
+  .status-group { display: flex; flex-direction: column; gap: 8px; }
+  .status-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; position: relative; }
+  .status-option:hover { border-color: var(--navy-light); background: var(--surface); }
+  .status-option.selected-recusa { border-color: var(--pink); background: var(--pink-pale); }
+  .status-option.selected-aprovado { border-color: var(--green); background: var(--green-pale); }
+  .status-option input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
+  .status-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+  .icon-recusa { background: var(--pink-pale); color: var(--pink); }
+  .icon-aprovado { background: var(--green-pale); color: var(--green); }
+  .selected-recusa .icon-recusa { background: var(--pink); color: var(--white); }
+  .selected-aprovado .icon-aprovado { background: var(--green); color: var(--white); }
+  .status-text { flex: 1; }
+  .status-text strong { display: block; font-size: 13px; font-weight: 600; color: var(--text); }
+  .status-text span { font-size: 12px; color: var(--text-muted); }
+  .check-mark { color: var(--green); font-size: 18px; opacity: 0; transition: opacity 0.15s; }
+  .selected-aprovado .check-mark, .selected-recusa .check-mark { opacity: 1; }
+  .selected-recusa .check-mark { color: var(--pink); }
+  .btn-submit { width: 100%; height: 46px; background: var(--navy); color: var(--white); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 1.5rem; transition: background 0.15s, transform 0.1s; }
+  .btn-submit:hover { background: var(--navy-mid); }
+  .btn-submit:active { transform: scale(0.99); }
+  .table-header { padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); gap: 12px; flex-wrap: wrap; }
+  .search-box { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px; height: 36px; flex: 1; max-width: 260px; }
+  .search-box i { color: var(--text-muted); font-size: 16px; }
+  .search-box input { border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); width: 100%; height: 100%; outline: none; padding: 0; box-shadow: none; }
+  .filter-tabs { display: flex; gap: 6px; }
+  .filter-tab { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .filter-tab.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+  .filter-tab.pink.active { background: var(--pink); border-color: var(--pink); color: var(--white); }
+  .filter-tab.green.active { background: var(--green); border-color: var(--green); color: var(--white); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; cursor: pointer; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { filter: brightness(0.97); }
+  tbody td { padding: 11px 16px; font-size: 13px; color: var(--text); vertical-align: middle; }
+  .td-name { font-weight: 600; font-size: 14px; }
+  .td-cpf { font-family: monospace; font-size: 12px; color: var(--text-muted); }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge-recusa { background: var(--pink-pale); color: var(--pink); }
+  .badge-aprovado { background: var(--green-pale); color: #0F7A52; }
+  .prazo-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .prazo-vencido { background: #FEE2E2; color: #DC2626; }
+  .prazo-urgente { background: #FFEDD5; color: #C2410C; }
+  .prazo-alerta  { background: #FEF3C7; color: #B45309; }
+  .prazo-ok      { font-size: 12px; color: var(--text-muted); }
+  .prazo-vazio   { font-size: 12px; color: var(--text-muted); }
+  .empty-state { padding: 3rem; text-align: center; color: var(--text-muted); }
+  .empty-state i { font-size: 40px; display: block; margin-bottom: 12px; opacity: 0.3; }
+  .empty-state p { font-size: 14px; }
+  .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--navy); color: var(--white); padding: 14px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 24px rgba(11,31,58,0.25); transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index: 999; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast i { color: var(--green); font-size: 20px; }
+  .atendente-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--surface); border: 1px solid var(--border); padding: 2px 8px 2px 4px; border-radius: 20px; font-size: 12px; color: var(--text-muted); }
+  .atendente-avatar { width: 18px; height: 18px; background: var(--navy); color: var(--white); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; }
+  .section-divider { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; padding: 4px 0 6px; display: flex; align-items: center; gap: 8px; }
+  .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(11,31,58,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal { background: var(--white); border-radius: var(--radius); width: 100%; max-width: 540px; overflow: hidden; transform: scale(0.95); transition: transform 0.2s; }
+  .modal-overlay.open .modal { transform: scale(1); }
+  .modal-header { background: var(--navy); padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h3 { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); }
+  .modal-close { background: none; border: none; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 20px; display: flex; align-items: center; }
+  .modal-close:hover { color: var(--white); }
+  .modal-body { padding: 1.5rem; }
+  .detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  .detail-value { font-size: 14px; font-weight: 500; color: var(--text); text-align: right; }
+  .btn-delete { background: none; border: 1px solid var(--pink); color: var(--pink); padding: 8px 16px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; }
+  .btn-delete:hover { background: var(--pink); color: var(--white); }
+  .btn-edit { background: none; border: 1px solid var(--navy-light); color: var(--navy); padding: 8px 16px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; }
+  .btn-edit:hover { background: var(--navy); color: var(--white); }
+  .table-scroll { overflow-x: auto; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Inovando <span>Consignado</span></div>
+  <div class="header-badge"><i class="ti ti-database" style="vertical-align:-2px;margin-right:4px;font-size:12px;"></i>CRM</div>
+</header>
+
+<div class="container">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total de registros</div><div class="stat-value" id="statTotal">0</div></div>
+    <div class="stat-card"><div class="stat-label">Aprovados</div><div class="stat-value green" id="statAprovado">0</div></div>
+    <div class="stat-card"><div class="stat-label">Recusados</div><div class="stat-value pink" id="statRecusado">0</div></div>
+    <div class="stat-card"><div class="stat-label">Taxa de aprovacao</div><div class="stat-value" id="statTaxa">–</div></div>
+    <div class="stat-card"><div class="stat-label">Próx. 3 meses (30d)</div><div class="stat-value amber" id="statAlerta3">0</div></div>
+    <div class="stat-card"><div class="stat-label">Próx. 6 meses (30d)</div><div class="stat-value purple" id="statAlerta6">0</div></div>
+  </div>
+
+  <div class="main-grid">
+    <div class="card">
+      <div class="card-header"><i class="ti ti-user-plus"></i><h2>Novo registro</h2></div>
+      <div class="card-body">
+        <div class="form-group"><label>Nome completo</label><input type="text" id="nome" placeholder="Ex: Maria da Silva"></div>
+        <div class="form-group"><label>CPF</label><input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14"></div>
+        <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="telefone" placeholder="(00) 00000-0000" maxlength="15"></div>
+        <div class="form-group">
+          <label>Data de admissao <span style="color:var(--pink);">*</span></label>
+          <input type="text" id="admissao" placeholder="DD/MM/AAAA" maxlength="10">
+          <div class="prazo-preview" id="previewPrazos">
+            <span>📅 3 meses: <strong id="prev3m">—</strong></span>
+            <span>📅 6 meses: <strong id="prev6m">—</strong></span>
+          </div>
+        </div>
+        <div class="form-group"><label>Atendente responsavel</label>
+          <select id="atendente">
+            <option value="">Selecione o atendente</option>
+            <option>Responsavel pela empresa</option>
+            <option>Jorrana</option>
+            <option>Hellen</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Data do registro</label>
+          <div class="date-field"><i class="ti ti-calendar"></i><span id="dataAtual"></span></div>
+        </div>
+
+        <div class="form-group" style="margin-top:1.25rem;">
+          <div class="section-divider">Recusa do cliente</div>
+          <div class="status-group">
+            <label class="status-option" onclick="selectStatus(this,'Nao passou na analise de credito','recusa')">
+              <input type="radio" name="status">
+              <div class="status-icon icon-recusa"><i class="ti ti-x"></i></div>
+              <div class="status-text"><strong>Nao passou na analise de credito</strong><span>Perfil reprovado pelo banco</span></div>
+              <i class="ti ti-circle-check check-mark"></i>
+            </label>
+            <label class="status-option" onclick="selectStatus(this,'Cliente nao tem 6 meses de carteira','recusa')">
+              <input type="radio" name="status">
+              <div class="status-icon icon-recusa"><i class="ti ti-clock"></i></div>
+              <div class="status-text"><strong>Menos de 6 meses de carteira</strong><span>Tempo de empresa insuficiente</span></div>
+              <i class="ti ti-circle-check check-mark"></i>
+            </label>
+            <label class="status-option" onclick="selectStatus(this,'Cliente nao tem 3 meses de carteira','recusa')">
+              <input type="radio" name="status">
+              <div class="status-icon icon-recusa"><i class="ti ti-clock"></i></div>
+              <div class="status-text"><strong>Menos de 3 meses de carteira</strong><span>Ainda em periodo de experiencia</span></div>
+              <i class="ti ti-circle-check check-mark"></i>
+            </label>
+            <label class="status-option" onclick="selectStatus(this,'CNPJ da empresa com menos de 2 anos','recusa')">
+              <input type="radio" name="status">
+              <div class="status-icon icon-recusa"><i class="ti ti-building"></i></div>
+              <div class="status-text"><strong>CNPJ com menos de 2 anos ativo</strong><span>Empresa nao atende criterio do banco</span></div>
+              <i class="ti ti-circle-check check-mark"></i>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:1rem;">
+          <div class="section-divider">Cliente aprovado</div>
+          <div class="status-group">
+            <label class="status-option" onclick="selectStatus(this,'Nao quis','aprovado')">
+              <input type="radio" name="status">
+              <div class="status-icon icon-aprovado"><i class="ti ti-thumb-down"></i></div>
+              <div class="status-text"><strong>Nao quis</strong><span>Aprovado, mas recusou a proposta</span></div>
+              <i class="ti ti-circle-check check-mark"></i>
+            </label>
+            <label class="status-option" onclick="selectStatus(this,'Fez e finalizou','aprovado')">
+              <input type="radio" name="status">
+              <div class="status-icon icon-aprovado"><i class="ti ti-check"></i></div>
+              <div class="status-text"><strong>Fez e finalizou</strong><span>Contrato assinado e concluido</span></div>
+              <i class="ti ti-circle-check check-mark"></i>
+            </label>
+            <label class="status-option" onclick="selectStatus(this,'Nao aceitou o repasse','aprovado')">
+              <input type="radio" name="status">
+              <div class="status-icon icon-aprovado"><i class="ti ti-transfer"></i></div>
+              <div class="status-text"><strong>Nao aceitou o repasse</strong><span>Aprovado, recusou transferencia</span></div>
+              <i class="ti ti-circle-check check-mark"></i>
+            </label>
+          </div>
+        </div>
+
+        <button class="btn-submit" onclick="salvarRegistro()">
+          <i class="ti ti-device-floppy"></i> Salvar registro
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-header">
+        <div class="search-box">
+          <i class="ti ti-search"></i>
+          <input type="text" id="searchInput" placeholder="Buscar por nome ou CPF..." oninput="renderTabela()">
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setFiltro('todos',this)">Todos</button>
+          <button class="filter-tab pink"   onclick="setFiltro('recusa',this)">Recusas</button>
+          <button class="filter-tab green"  onclick="setFiltro('aprovado',this)">Aprovados</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>CPF</th>
+              <th>Telefone</th>
+              <th>Admissão</th>
+              <th>3 Meses em</th>
+              <th>6 Meses em</th>
+              <th>Status</th>
+              <th>Atendente</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaBody"></tbody>
+        </table>
+        <div id="emptyState" class="empty-state" style="display:none;">
+          <i class="ti ti-database-off"></i>
+          <p>Nenhum registro encontrado.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalNome"></h3>
+      <button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toastMsg"></span></div>
+
+<script>
+let registros = JSON.parse(localStorage.getItem('crm_inovando') || '[]');
+let filtroAtivo = 'todos', statusSelecionado = '', tipoSelecionado = '';
+
+function formatDate(d) {
+  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function atualizarData() { document.getElementById('dataAtual').textContent = formatDate(new Date()); }
+atualizarData(); setInterval(atualizarData, 60000);
+
+function formatCPF(v) { return v.replace(/\D/g,'').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); }
+function formatTel(v) { return v.replace(/\D/g,'').replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{4})$/,'$1-$2'); }
+
+document.getElementById('cpf').addEventListener('input', function(){ this.value = formatCPF(this.value); });
+document.getElementById('telefone').addEventListener('input', function(){ this.value = formatTel(this.value); });
+document.getElementById('admissao').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g,'');
+  if (v.length >= 3) v = v.substring(0,2)+'/'+v.substring(2);
+  if (v.length >= 6) v = v.substring(0,5)+'/'+v.substring(5,9);
+  this.value = v;
+  const d3 = calcDataMeses(v, 3), d6 = calcDataMeses(v, 6);
+  const prev = document.getElementById('previewPrazos');
+  if (d3) {
+    document.getElementById('prev3m').textContent = d3.toLocaleDateString('pt-BR');
+    document.getElementById('prev6m').textContent = d6.toLocaleDateString('pt-BR');
+    prev.style.display = 'flex';
+  } else { prev.style.display = 'none'; }
+});
+
+function calcDataMeses(admissao, meses) {
+  if (!admissao || admissao.length < 10) return null;
+  const [d,m,y] = admissao.split('/').map(Number);
+  if (!d||!m||!y||y<2000) return null;
+  return new Date(y, m - 1 + meses, d);
+}
+function formatarPrazo(admissao, meses) {
+  const dt = calcDataMeses(admissao, meses);
+  return dt ? dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+}
+function diasPara(admissao, meses) {
+  const dt = calcDataMeses(admissao, meses); if (!dt) return null;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  return Math.ceil((dt - hoje) / 86400000);
+}
+function prazoBadge(admissao, meses) {
+  const dt = formatarPrazo(admissao, meses);
+  const dias = diasPara(admissao, meses);
+  if (dias === null) return `<span class="prazo-vazio">—</span>`;
+  if (dias <= 0)  return `<span class="prazo-badge prazo-vencido"><i class="ti ti-alarm" style="font-size:11px;"></i>${dt} ⚠️</span>`;
+  if (dias <= 7)  return `<span class="prazo-badge prazo-urgente"><i class="ti ti-alarm" style="font-size:11px;"></i>${dt} (${dias}d)</span>`;
+  if (dias <= 30) return `<span class="prazo-badge prazo-alerta"><i class="ti ti-clock" style="font-size:11px;"></i>${dt} (${dias}d)</span>`;
+  return `<span class="prazo-ok">${dt}</span>`;
+}
+function rowBg(admissao) {
+  const vals = [diasPara(admissao,3), diasPara(admissao,6)].filter(x=>x!==null);
+  if (!vals.length) return '';
+  const min = Math.min(...vals);
+  if (min <= 0)  return 'background:#FFF5F5;';
+  if (min <= 7)  return 'background:#FFFBEB;';
+  if (min <= 30) return 'background:#FEFCE8;';
+  return '';
+}
+
+function selectStatus(el, valor, tipo) {
+  document.querySelectorAll('.status-option').forEach(o=>o.classList.remove('selected-recusa','selected-aprovado'));
+  el.classList.add(tipo==='recusa'?'selected-recusa':'selected-aprovado');
+  statusSelecionado = valor; tipoSelecionado = tipo;
+}
+function showToast(msg, tipo) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.querySelector('i').className = tipo==='erro'?'ti ti-alert-circle':'ti ti-circle-check';
+  t.querySelector('i').style.color = tipo==='erro'?'#E8547A':'#1CB87B';
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwyEqjLkob6wQEpKIs-C4F5lNUB1X5VMMM3dehE8Vu10e-86ey-bhodKmGxkLI-da5auA/exec';
+
+async function salvarRegistro() {
+  const nome=document.getElementById('nome').value.trim(), cpf=document.getElementById('cpf').value.trim(),
+        telefone=document.getElementById('telefone').value.trim(), atendente=document.getElementById('atendente').value,
+        admissao=document.getElementById('admissao').value.trim();
+  if (!nome||!cpf||!telefone||!atendente||!statusSelecionado) { showToast('Preencha todos os campos antes de salvar.','erro'); return; }
+  const reg = { id:Date.now(), nome, cpf, telefone, admissao,
+    data3meses: formatarPrazo(admissao,3), data6meses: formatarPrazo(admissao,6),
+    atendente, status:statusSelecionado, tipo:tipoSelecionado, data:formatDate(new Date()) };
+  const btn = document.querySelector('.btn-submit');
+  btn.disabled=true; btn.innerHTML='<i class="ti ti-loader-2" style="animation:spin 1s linear infinite;"></i> Salvando...';
+  try {
+    await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(reg)});
+    registros.unshift(reg); salvarLS(); renderTabela(); atualizarStats(); limparForm();
+    showToast('Registro salvo na planilha!');
+  } catch(err) {
+    registros.unshift(reg); salvarLS(); renderTabela(); atualizarStats(); limparForm();
+    showToast('Salvo localmente. Verifique a conexao.','erro');
+  }
+  btn.disabled=false; btn.innerHTML='<i class="ti ti-device-floppy"></i> Salvar registro';
+}
+
+function salvarLS() { localStorage.setItem('crm_inovando', JSON.stringify(registros)); }
+function limparForm() {
+  ['nome','cpf','telefone','admissao'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('atendente').value='';
+  document.getElementById('previewPrazos').style.display='none';
+  document.querySelectorAll('.status-option').forEach(o=>o.classList.remove('selected-recusa','selected-aprovado'));
+  statusSelecionado=''; tipoSelecionado='';
+}
+function setFiltro(f,btn) {
+  filtroAtivo=f; document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderTabela();
+}
+function renderTabela() {
+  const busca=document.getElementById('searchInput').value.toLowerCase();
+  const lista=registros.filter(r=>(filtroAtivo==='todos'||r.tipo===filtroAtivo)&&(r.nome.toLowerCase().includes(busca)||r.cpf.includes(busca)));
+  const tbody=document.getElementById('tabelaBody'), empty=document.getElementById('emptyState');
+  if (!lista.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML=lista.map(r=>{
+    const ini=r.atendente.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    return `<tr onclick="abrirModal(${r.id})" style="${rowBg(r.admissao)}">
+      <td class="td-name">${r.nome}</td>
+      <td class="td-cpf">${r.cpf}</td>
+      <td style="font-size:13px;">${r.telefone}</td>
+      <td style="font-size:12px;color:var(--text-muted);">${r.admissao||'—'}</td>
+      <td>${prazoBadge(r.admissao,3)}</td>
+      <td>${prazoBadge(r.admissao,6)}</td>
+      <td><span class="badge ${r.tipo==='recusa'?'badge-recusa':'badge-aprovado'}"><i class="ti ${r.tipo==='recusa'?'ti-x':'ti-check'}"></i>${r.status}</span></td>
+      <td><span class="atendente-badge"><span class="atendente-avatar">${ini}</span>${r.atendente}</span></td>
+      <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">${r.data}</td>
+    </tr>`;
+  }).join('');
+}
+function atualizarStats() {
+  const t=registros.length, ap=registros.filter(r=>r.tipo==='aprovado').length, re=registros.filter(r=>r.tipo==='recusa').length;
+  const a3=registros.filter(r=>{const d=diasPara(r.admissao,3);return d!==null&&d>=0&&d<=30;}).length;
+  const a6=registros.filter(r=>{const d=diasPara(r.admissao,6);return d!==null&&d>=0&&d<=30;}).length;
+  document.getElementById('statTotal').textContent=t;
+  document.getElementById('statAprovado').textContent=ap;
+  document.getElementById('statRecusado').textContent=re;
+  document.getElementById('statTaxa').textContent=t>0?Math.round(ap/t*100)+'%':'–';
+  document.getElementById('statAlerta3').textContent=a3;
+  document.getElementById('statAlerta6').textContent=a6;
+}
+
+const statusOpcoes=[
+  {valor:'Nao passou na analise de credito',tipo:'recusa',label:'Nao passou na analise de credito'},
+  {valor:'Cliente nao tem 6 meses de carteira',tipo:'recusa',label:'Menos de 6 meses de carteira'},
+  {valor:'Cliente nao tem 3 meses de carteira',tipo:'recusa',label:'Menos de 3 meses de carteira'},
+  {valor:'CNPJ da empresa com menos de 2 anos',tipo:'recusa',label:'CNPJ com menos de 2 anos ativo'},
+  {valor:'Nao quis',tipo:'aprovado',label:'Nao quis'},
+  {valor:'Fez e finalizou',tipo:'aprovado',label:'Fez e finalizou'},
+  {valor:'Nao aceitou o repasse',tipo:'aprovado',label:'Nao aceitou o repasse'},
+];
+
+function abrirModal(id) {
+  const r=registros.find(x=>x.id===id); if(!r) return;
+  const d3=diasPara(r.admissao,3), d6=diasPara(r.admissao,6);
+  const fmt3=r.data3meses||formatarPrazo(r.admissao,3), fmt6=r.data6meses||formatarPrazo(r.admissao,6);
+  const diasTxt=d=>d===null?'—':d<=0?`<span style="color:#DC2626;font-weight:700;">Prazo vencido / hoje</span>`:`${d} dias restantes`;
+  document.getElementById('modalNome').textContent=r.nome;
+  document.getElementById('modalBody').innerHTML=`
+    <div class="detail-row"><span class="detail-label">CPF</span><span class="detail-value" style="font-family:monospace;">${r.cpf}</span></div>
+    <div class="detail-row"><span class="detail-label">Telefone</span><span class="detail-value">${r.telefone}</span></div>
+    <div class="detail-row"><span class="detail-label">Data de admissao</span><span class="detail-value">${r.admissao||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Completa 3 meses em</span><span class="detail-value">${fmt3} <small style="color:var(--text-muted);">(${diasTxt(d3)})</small></span></div>
+    <div class="detail-row"><span class="detail-label">Completa 6 meses em</span><span class="detail-value">${fmt6} <small style="color:var(--text-muted);">(${diasTxt(d6)})</small></span></div>
+    <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="badge ${r.tipo==='recusa'?'badge-recusa':'badge-aprovado'}">${r.status}</span></span></div>
+    <div class="detail-row"><span class="detail-label">Atendente</span><span class="detail-value">${r.atendente}</span></div>
+    <div class="detail-row"><span class="detail-label">Data do registro</span><span class="detail-value">${r.data}</span></div>
+    <div style="margin-top:1.5rem;display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn-edit" onclick="abrirEdicao(${r.id})"><i class="ti ti-pencil"></i>Editar</button>
+      <button class="btn-delete" onclick="deletarRegistro(${r.id})"><i class="ti ti-trash"></i>Remover</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function abrirEdicao(id) {
+  const r=registros.find(x=>x.id===id); if(!r) return;
+  document.getElementById('modalNome').textContent='Editando: '+r.nome;
+  document.getElementById('modalBody').innerHTML=`
+    <div class="form-group"><label>Nome completo</label><input type="text" id="edit-nome" value="${r.nome}"></div>
+    <div class="form-group"><label>CPF</label><input type="text" id="edit-cpf" value="${r.cpf}" maxlength="14"></div>
+    <div class="form-group"><label>Telefone</label><input type="tel" id="edit-telefone" value="${r.telefone}" maxlength="15"></div>
+    <div class="form-group"><label>Data de admissao</label><input type="text" id="edit-admissao" value="${r.admissao||''}" placeholder="DD/MM/AAAA" maxlength="10"></div>
+    <div class="form-group"><label>Atendente</label>
+      <select id="edit-atendente">
+        <option ${r.atendente==='Responsavel pela empresa'?'selected':''}>Responsavel pela empresa</option>
+        <option ${r.atendente==='Jorrana'?'selected':''}>Jorrana</option>
+        <option ${r.atendente==='Hellen'?'selected':''}>Hellen</option>
+      </select></div>
+    <div class="form-group"><label>Status</label>
+      <select id="edit-status">${statusOpcoes.map(o=>`<option value="${o.valor}" ${r.status===o.valor?'selected':''}>${o.label}</option>`).join('')}</select></div>
+    <div style="margin-top:1.5rem;display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn-delete" onclick="abrirModal(${r.id})" style="border-color:var(--border);color:var(--text-muted);"><i class="ti ti-arrow-left"></i>Voltar</button>
+      <button class="btn-submit" style="width:auto;padding:0 20px;" onclick="salvarEdicao(${r.id})"><i class="ti ti-device-floppy"></i>Salvar</button>
+    </div>`;
+}
+function salvarEdicao(id) {
+  const idx=registros.findIndex(x=>x.id===id); if(idx===-1) return;
+  const statusVal=document.getElementById('edit-status').value;
+  const tipoVal=statusOpcoes.find(o=>o.valor===statusVal)?.tipo||'recusa';
+  const admissao=document.getElementById('edit-admissao').value.trim();
+  registros[idx]={...registros[idx],
+    nome:document.getElementById('edit-nome').value.trim(),
+    cpf:document.getElementById('edit-cpf').value.trim(),
+    telefone:document.getElementById('edit-telefone').value.trim(),
+    admissao, data3meses:formatarPrazo(admissao,3), data6meses:formatarPrazo(admissao,6),
+    atendente:document.getElementById('edit-atendente').value, status:statusVal, tipo:tipoVal};
+  salvarLS(); renderTabela(); atualizarStats(); fecharModal();
+  showToast('Registro atualizado com sucesso!');
+}
+function fecharModal(e) {
+  if (!e||e.target===document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+function deletarRegistro(id) {
+  if (!confirm('Tem certeza que deseja remover este registro?')) return;
+  registros=registros.filter(r=>r.id!==id); salvarLS(); renderTabela(); atualizarStats(); fecharModal();
+  showToast('Registro removido.');
+}
+renderTabela(); atualizarStats();
+</script>
+</body>
+</html>
